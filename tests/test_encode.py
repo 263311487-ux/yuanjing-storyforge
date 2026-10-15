@@ -3,6 +3,17 @@ from pathlib import Path
 ROOT=Path(__file__).parents[1]
 class Encode(unittest.TestCase):
  @unittest.skipUnless(shutil.which('ffmpeg'),'ffmpeg unavailable')
+ def test_technical_qa_uses_manifest_delivery_contract(self):
+  with tempfile.TemporaryDirectory() as d:
+   root=Path(d); video=root/'master.mp4'; manifest=root/'manifest.json'; work=root/'work'; work.mkdir()
+   subprocess.run([sys.executable,str(ROOT/'scripts/fixture_episode.py'),'--manifest',str(ROOT/'examples/episode.json'),'--out',str(work)],check=True,stdout=subprocess.DEVNULL)
+   shot=work/'制作成果'/'video'/'S01.mp4'
+   subprocess.run(['ffmpeg','-y','-loglevel','error','-i',str(shot),'-an','-vf','scale=720:1280','-r','24',str(video)],check=True)
+   subs=work/'制作成果'/'subs'; subs.mkdir(parents=True); (subs/'The Signal_EP01.srt').write_text('1\\n00:00:00,000 --> 00:00:01,000\\n\\n',encoding='utf-8')
+   data=json.loads((ROOT/'examples/episode.json').read_text(encoding='utf-8')); data['delivery'].update({'width':720,'height':1280,'fps':24,'audio':False,'subtitles':False}); data['shots']=data['shots'][:1]; manifest.write_text(json.dumps(data,ensure_ascii=False),encoding='utf-8')
+   p=subprocess.run([sys.executable,str(ROOT/'scripts/technical_qa.py'),'--video',str(video),'--manifest',str(manifest),'--workdir',str(work),'--out',str(root/'qa.json')],capture_output=True,text=True)
+   self.assertEqual(p.returncode,0,p.stdout+p.stderr); self.assertEqual(json.loads((root/'qa.json').read_text())['status'],'PASS')
+ @unittest.skipUnless(shutil.which('ffmpeg'),'ffmpeg unavailable')
  def test_delivery_rejects_media_replaced_after_approval(self):
   with tempfile.TemporaryDirectory() as d:
    target=Path(d)/'delivery'; subprocess.run([sys.executable,str(ROOT/'scripts/offline_delivery.py'),str(ROOT/'examples/episode.json'),'--out',str(target)],check=True,stdout=subprocess.DEVNULL)

@@ -4,8 +4,6 @@ import argparse, json, subprocess
 import re
 from pathlib import Path
 
-W, H, FPS = 1080, 1920, 25
-
 def probe(path):
     raw = subprocess.check_output([
         "ffprobe", "-v", "error", "-show_streams", "-show_format",
@@ -22,6 +20,12 @@ def main():
     args = ap.parse_args()
     video, manifest = Path(args.video).resolve(), Path(args.manifest).resolve()
     cfg = json.loads(manifest.read_text(encoding="utf-8"))
+    delivery = cfg.get("delivery") or {}
+    width = int(delivery.get("width", 1080))
+    height = int(delivery.get("height", 1920))
+    fps = int(delivery.get("fps", 25))
+    expect_audio = bool(delivery.get("audio", True))
+    expect_subtitles = bool(delivery.get("subtitles", True))
     errors, warnings, shots = [], [], []
     if not video.exists() or video.stat().st_size < 1024:
         errors.append("missing_or_empty_master")
@@ -33,12 +37,12 @@ def main():
             a = next((s for s in streams if s.get("codec_type") == "audio"), None)
             if not v: errors.append("missing_video_stream")
             else:
-                if int(v.get("width", 0)) != W or int(v.get("height", 0)) != H:
+                if int(v.get("width", 0)) != width or int(v.get("height", 0)) != height:
                     errors.append(f"video_dimensions:{v.get('width')}x{v.get('height')}")
                 rate = v.get("r_frame_rate", "")
-                if rate not in ("25/1", "25/1.0"):
+            if rate not in (f"{fps}/1", f"{fps}/1.0"):
                     errors.append(f"frame_rate:{rate}")
-            if not a: errors.append("missing_audio_stream")
+            if expect_audio and not a: errors.append("missing_audio_stream")
             duration = float(info.get("format", {}).get("duration", 0) or 0)
             if duration <= 0.5: errors.append("invalid_duration")
             # Deterministic media checks: black frames and unusable loudness.
@@ -46,16 +50,17 @@ def main():
             # blackdetect is codec/pixel-format sensitive; retain evidence as a
             # warning until a calibrated per-frame detector is added.
             if "black_start" in (black.stderr or ""): warnings.append("black_frame_detected_needs_review")
-            vol = subprocess.run(["ffmpeg", "-hide_banner", "-i", str(video), "-af", "ebur128=peak=true", "-f", "null", "-"], capture_output=True, text=True)
-            text = vol.stderr or ""
-            loud = re.search(r"Integrated loudness:\s+I:\s+(-?[0-9.]+) LUFS", text)
-            peak = re.search(r"True peak:\s+Peak:\s+(-?[0-9.]+) dBFS", text)
-            if not loud or not peak:
-                errors.append("audio_loudness_unmeasured")
-            else:
-                lufs, dbfs = float(loud.group(1)), float(peak.group(1))
-                if not -24.0 <= lufs <= -14.0: errors.append(f"integrated_loudness:{lufs:.1f}LUFS")
-                if dbfs > -1.0: errors.append(f"true_peak:{dbfs:.1f}dBFS")
+            if expect_audio:
+                vol = subprocess.run(["ffmpeg", "-hide_banner", "-i", str(video), "-af", "ebur128=peak=true", "-f", "null", "-"], capture_output=True, text=True)
+                text = vol.stderr or ""
+                loud = re.search(r"Integrated loudness:\s+I:\s+(-?[0-9.]+) LUFS", text)
+                peak = re.search(r"True peak:\s+Peak:\s+(-?[0-9.]+) dBFS", text)
+                if not loud or not peak:
+                    errors.append("audio_loudness_unmeasured")
+                else:
+                    lufs, dbfs = float(loud.group(1)), float(peak.group(1))
+                    if not -24.0 <= lufs <= -14.0: errors.append(f"integrated_loudness:{lufs:.1f}LUFS")
+                    if dbfs > -1.0: errors.append(f"true_peak:{dbfs:.1f}dBFS")
         except Exception as exc:
             errors.append(f"ffprobe_failed:{type(exc).__name__}")
     workdir = Path(args.workdir).resolve() if args.workdir else manifest.parent
@@ -71,8 +76,9 @@ def main():
               "warnings": warnings, "shot_count": len(shots),
               "expected_shots": len(cfg.get("shots", [])), "video": str(video)}
     srt = workdir / "制作成果" / "subs" / f"{cfg.get('title','episode')}_EP{cfg.get('episode','01')}.srt"
-    if not srt.exists(): errors.append("missing_srt")
-    else:
+    if expect_subtitles and not srt.exists():
+        errors.append("missing_srt")
+    elif expect_subtitles:
         raw = srt.read_text(encoding="utf-8", errors="replace")
         if re.search(r"-->[^\n]*\n\s*\n", raw): errors.append("empty_subtitle_entry")
         result["subtitle"] = {"path": str(srt), "bytes": srt.stat().st_size}
