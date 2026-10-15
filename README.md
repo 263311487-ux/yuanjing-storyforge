@@ -113,7 +113,7 @@ python3 scripts/run_mock.py examples/episode.json --state work/run_state.json
 
 ## Seedance plan (explicit opt-in)
 
-The adapter can inspect capabilities and construct a command without submitting. `--execute` is required for network generation; never use it without a provider budget and user approval.
+The planning script constructs a command without submitting and rejects `--execute`. Actual submission is available only through `SeedanceCLI(execute=True)` after the caller has confirmed the provider budget and user authorization.
 
 ```sh
 python3 scripts/seedance_plan.py examples/episode.json --shot S01

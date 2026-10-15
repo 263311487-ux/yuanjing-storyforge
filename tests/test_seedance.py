@@ -1,4 +1,4 @@
-import json,unittest,subprocess,tempfile
+import json,unittest,subprocess,tempfile,sys
 from unittest.mock import patch
 from pathlib import Path
 from ai_comic_drama.seedance import SeedanceCLI
@@ -11,6 +11,10 @@ class Seedance(unittest.TestCase):
   c=SeedanceCLI().command(self.s); self.assertEqual(c[1],'generate'); self.assertIn('--model',c); self.assertNotIn('--wait',c)
  def test_submit_blocked_by_default(self):
   j=SeedanceCLI().submit_shot(self.s,'r1'); self.assertEqual(j.status,'blocked')
+ def test_plan_cli_rejects_execute_flag(self):
+  result=subprocess.run([sys.executable,str(ROOT/'scripts/seedance_plan.py'),str(ROOT/'examples/episode.json'),'--shot','S01','--execute'],capture_output=True,text=True,encoding='utf-8')
+  self.assertNotEqual(result.returncode,0)
+  self.assertIn('unrecognized arguments: --execute',result.stderr)
  def test_parse_task_id_shapes(self):
   self.assertEqual(SeedanceCLI.parse_task_id('{"task_id":"abc"}'),'abc')
   self.assertEqual(SeedanceCLI.parse_task_id('{"id":"xyz"}'),'xyz')
