@@ -2,7 +2,7 @@
 import json,sys
 from pathlib import Path
 def main(p, strict=False):
- try:d=json.loads(Path(p).read_text())
+ try:d=json.loads(Path(p).read_text(encoding='utf-8'))
  except Exception as e: print('ERROR: invalid JSON:',e); return 1
  ok=True
  for k in ['schema_version','episode_id','title','ratio','delivery','provider','budget','shots']:
