@@ -127,7 +127,7 @@ Run the full offline delivery gate with `python3 scripts/offline_delivery.py exa
 
 ## Human content review and publish approval
 
-Approval records bind only the bytes of `qa_result.json`. They do not hash or lock video, audio, subtitles or covers; replacing those files does not invalidate this approval. Reviewer/publisher names are self-reported strings, not authenticated identities or signatures. Before real distribution, separately verify media hashes, access control, reviewer identity and platform compliance. These controls are outside this offline example.
+Approval records bind the content-review report and the exact files supplied with `--file`. Bind the final video, manifest, subtitle, and cover files; the delivery gate rejects a missing or changed required file. Reviewer/publisher names remain self-reported strings, not authenticated identities or signatures. Before real distribution, separately verify reviewer identity and platform compliance.
 
 Record an actual human review in `qa_result.json` (repeat `--shot` for each reviewed shot):
 
@@ -138,14 +138,14 @@ python3 scripts/record_content_review.py --out work/delivery/qa_result.json --st
 Use `PENDING_HUMAN_REVIEW` until review is complete, or `FAIL` when it fails. This records the review; it does not inspect video or grant publish approval. Only after content review PASS and independently verified compliance PASS may an authorized publisher create the separate, hash-bound approval:
 
 ```sh
-python3 scripts/approve_publish.py --qa work/delivery/qa_result.json --approved-by "Publisher" --basis "Release approved"
+python3 scripts/approve_publish.py --qa work/delivery/qa_result.json --approved-by "Publisher" --basis "Release approved" --file work/delivery/master.mp4 --file examples/episode.json --file work/delivery/制作成果/subs/The\ Signal_EP01.srt
 ```
 
-Changing `qa_result.json` after approval invalidates that approval. The delivery manifest also requires technical QA PASS, compliance PASS, release metadata, subtitles, content review PASS, and separate human publish approval.
+Changing `qa_result.json` or any bound file after approval invalidates that approval. The delivery manifest also requires technical QA PASS, compliance PASS, release metadata, subtitles, content review PASS, and separate human publish approval. Add one `--file` for each final cover or other release asset that the reviewer approved.
 
 ## Current boundaries
 
-The Seedance adapter requires explicit execution opt-in; this repository does not claim automated story review or platform approval. Legacy narrative and compliance keyword gates are advisory and use a different manifest contract. Do not use them to certify release readiness.
+The bundled Seedance adapter requires explicit execution opt-in and is not a complete production integration: provider submission, polling, and download have not been validated against a real paid run in this repository. The documented audio-mode issue in `references/workflow.md` remains unresolved; do not treat the legacy audio mode as verified. This repository does not claim automated story review or platform approval. Legacy narrative and compliance keyword gates are advisory and use a different manifest contract. Do not use them to certify release readiness.
 
 ## Offline quick start
 

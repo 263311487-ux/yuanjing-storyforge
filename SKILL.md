@@ -22,4 +22,4 @@ Keyword checks cannot certify compliance. Unreviewed reports cannot certify cont
 
 The offline MockProvider and resumable runner are implemented in `ai_comic_drama/`. Real provider adapters remain opt-in and must follow references/providers.md.
 
-Approval integrity is limited to the content report bytes. It does not bind media hashes or authenticate self-reported reviewer/publisher names. Real publication requires separate identity and media-integrity controls.
+Publish approval binds the content report and every required release asset explicitly passed with `approve_publish.py --file`; delivery rejects missing or changed video, manifest, and subtitle hashes. Reviewer/publisher names are self-reported, not authenticated. Real publication still requires external identity and platform-compliance controls. The Seedance adapter has not been verified in a real paid run; the documented legacy audio mode is not production-validated.
