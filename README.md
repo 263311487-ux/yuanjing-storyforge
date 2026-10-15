@@ -25,6 +25,7 @@ python3 -m pip install .
 This installs `ai_comic_drama`; it does not install a provider CLI, ffmpeg, or paid-service credentials.
 
 The shortest offline example is documented in [`examples/offline-output/README.md`](examples/offline-output/README.md). Citation metadata is available in [`CITATION.cff`](CITATION.cff).
+常见安装、超时、下载恢复和成本边界见 [`references/troubleshooting.md`](references/troubleshooting.md)。
 
 ## First success in one minute
 

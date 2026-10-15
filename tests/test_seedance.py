@@ -1,4 +1,4 @@
-import json,unittest,subprocess
+import json,unittest,subprocess,tempfile
 from unittest.mock import patch
 from pathlib import Path
 from ai_comic_drama.seedance import SeedanceCLI
@@ -40,6 +40,6 @@ class Seedance(unittest.TestCase):
   self.assertEqual(job.status,'failed'); self.assertEqual(job.evidence['error'],'task_id_mismatch')
  def test_download_timeout_is_recorded(self):
   with patch('ai_comic_drama.seedance.subprocess.run',side_effect=subprocess.TimeoutExpired(['seedance'],2)) as run:
-   job=SeedanceCLI(download_timeout=2).download('task-1',Path('/tmp/storyforge-timeout.mp4'))
+   job=SeedanceCLI(download_timeout=2).download('task-1',Path(tempfile.gettempdir())/'storyforge-timeout.mp4')
   self.assertEqual(job['status'],'failed'); self.assertEqual(job['error'],'timeout')
   self.assertEqual(run.call_args.kwargs['timeout'],2)
