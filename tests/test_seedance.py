@@ -15,6 +15,14 @@ class Seedance(unittest.TestCase):
   result=subprocess.run([sys.executable,str(ROOT/'scripts/seedance_plan.py'),str(ROOT/'examples/episode.json'),'--shot','S01','--execute'],capture_output=True,text=True,encoding='utf-8')
   self.assertNotEqual(result.returncode,0)
   self.assertIn('unrecognized arguments: --execute',result.stderr)
+ def test_submit_evidence_does_not_persist_prompt_or_signed_url(self):
+  response='{"task_id":"task-1","video_url":"https://example.invalid/movie?X-TOS-SIGNATURE=secret"}'
+  with patch('ai_comic_drama.seedance.subprocess.run',return_value=subprocess.CompletedProcess([],0,response,'')):
+   job=SeedanceCLI(execute=True).submit_shot({**self.s,'prompt':'private prompt'},'r1')
+  serialized=json.dumps(job.evidence)
+  self.assertNotIn('private prompt',serialized)
+  self.assertNotIn('secret',serialized)
+  self.assertEqual(job.evidence['task_id'],'task-1')
  def test_parse_task_id_shapes(self):
   self.assertEqual(SeedanceCLI.parse_task_id('{"task_id":"abc"}'),'abc')
   self.assertEqual(SeedanceCLI.parse_task_id('{"id":"xyz"}'),'xyz')

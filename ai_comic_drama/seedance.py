@@ -33,12 +33,14 @@ class SeedanceCLI:
         try:
             proc=subprocess.run(cmd,capture_output=True,text=True,check=False,timeout=self.submit_timeout)
         except subprocess.TimeoutExpired as exc:
-            evidence={"command":cmd,"error":"timeout","timeout_seconds":self.submit_timeout,
-                      "stdout":str(exc.stdout or "")[-2000:],"stderr":str(exc.stderr or "")[-2000:]}
+            evidence={"error":"timeout","timeout_seconds":self.submit_timeout}
             return Job(shot["id"],f"timeout-{run_id}","unknown",self.name,evidence)
-        evidence={"command":cmd,"returncode":proc.returncode,"stdout":proc.stdout[-2000:],"stderr":proc.stderr[-2000:]}
-        status="submitted" if proc.returncode==0 else "failed"
         task_id=self.parse_task_id(proc.stdout)
+        try: payload=json.loads(proc.stdout)
+        except (json.JSONDecodeError, TypeError): payload={}
+        evidence={"returncode":proc.returncode,"task_id":task_id or None,
+                  "video_url_present":bool(isinstance(payload,dict) and payload.get("video_url"))}
+        status="submitted" if proc.returncode==0 else "failed"
         if status=="submitted" and not task_id:
             evidence["error"]="missing_task_id"
             status="unknown"
@@ -63,10 +65,9 @@ class SeedanceCLI:
         try:
             proc=subprocess.run([self.binary,"status",job_id,"--json"],capture_output=True,text=True,check=False,timeout=self.poll_timeout)
         except subprocess.TimeoutExpired as exc:
-            evidence={"error":"timeout","timeout_seconds":self.poll_timeout,
-                      "stdout":str(exc.stdout or "")[-2000:],"stderr":str(exc.stderr or "")[-2000:]}
+            evidence={"error":"timeout","timeout_seconds":self.poll_timeout}
             return Job("unknown",job_id,"running",self.name,evidence)
-        evidence={"returncode":proc.returncode,"stdout":proc.stdout[-2000:],"stderr":proc.stderr[-2000:]}
+        evidence={"returncode":proc.returncode}
         try: payload=json.loads(proc.stdout)
         except json.JSONDecodeError: payload={}
         returned_id=self.parse_task_id(proc.stdout)
@@ -83,7 +84,6 @@ class SeedanceCLI:
             proc=subprocess.run([self.binary,"download",job_id,"--output",str(output)],capture_output=True,text=True,check=False,timeout=self.download_timeout)
         except subprocess.TimeoutExpired as exc:
             return {"status":"failed","path":str(output),"bytes":output.stat().st_size if output.exists() else 0,
-                    "error":"timeout","timeout_seconds":self.download_timeout,
-                    "stdout":str(exc.stdout or "")[-2000:],"stderr":str(exc.stderr or "")[-2000:]}
+                    "error":"timeout","timeout_seconds":self.download_timeout}
         ok=proc.returncode==0 and output.exists() and output.stat().st_size>10240
-        return {"status":"succeeded" if ok else "failed","path":str(output),"bytes":output.stat().st_size if output.exists() else 0,"stdout":proc.stdout[-2000:],"stderr":proc.stderr[-2000:]}
+        return {"status":"succeeded" if ok else "failed","path":str(output),"bytes":output.stat().st_size if output.exists() else 0,"returncode":proc.returncode}
