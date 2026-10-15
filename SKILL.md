@@ -1,10 +1,10 @@
 ---
-name: ai-comic-drama
-description: "Manifest-first Codex Agent Skill for AI comic-drama production: shot planning, provider-neutral generation plans, cost gates, subtitles, assembly, technical QA, and auditable human review. Use when turning a script or shot list into a reproducible comic-drama production workflow; paid provider execution remains explicit opt-in."
+name: yuanjing-storyforge
+description: "Yuanjing Storyforge (元境·漫界工坊), formerly ai-comic-drama, is a manifest-first Agent Skill for comic-drama production: shot planning, provider-neutral generation plans, cost gates, subtitles, assembly, technical QA, and auditable human review. Use when turning a script or shot list into a reproducible comic-drama production workflow; paid provider execution remains explicit opt-in."
 metadata:
   version: 1.9.3
 ---
-# AI Comic Drama
+# Yuanjing Storyforge · 元境·漫界工坊
 
 Read README.md for executable commands and current limitations. Develop an approved script into shots with purpose, visible action, camera, dialogue and end state. Preserve the user's genre, duration, language and audio preferences.
 

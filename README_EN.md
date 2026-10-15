@@ -1,8 +1,10 @@
-# AI Comic Drama
+# Yuanjing Storyforge · 元境·漫界工坊
 
-Source release **1.9.3**, published 2026-10-09. This repository does not publish a registry package.
+**Yuanjing Storyforge** (元境·漫界工坊), formerly `ai-comic-drama`, is the unique name of this manifest-first comic-drama production skill. Search compatibility keywords: AI comic drama, AI short drama, 漫剧 skill.
 
-[![CI](https://github.com/263311487-ux/ai-comic-drama/actions/workflows/ci.yml/badge.svg)](https://github.com/263311487-ux/ai-comic-drama/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/263311487-ux/ai-comic-drama)](https://github.com/263311487-ux/ai-comic-drama/releases)
+Source release **1.9.3**, published 2026-10-09. This repository does not publish a registry package. The Python library module remains `ai_comic_drama` for compatibility.
+
+[![CI](https://github.com/263311487-ux/yuanjing-storyforge/actions/workflows/ci.yml/badge.svg)](https://github.com/263311487-ux/yuanjing-storyforge/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/263311487-ux/yuanjing-storyforge)](https://github.com/263311487-ux/yuanjing-storyforge/releases)
 
 Manifest-first Agent Skill for planning and validating AI comic-drama production. It provides provider-neutral contracts, offline resumable runs, cost gates, subtitle and assembly planning, optional encoding, technical QA, and auditable human review gates.
 
@@ -10,9 +12,9 @@ Manifest-first Agent Skill for planning and validating AI comic-drama production
 
 It is safe to try locally: examples and CI do not call paid providers. Video generation remains an explicit provider opt-in.
 
-## Install as a Codex skill
+## Install as an agent skill
 
-Copy this repository into your agent skills directory, or install it from GitHub with your skill installer. The entry point is [`SKILL.md`](SKILL.md). Python 3.11+ and the standard library are enough for the offline workflow.
+Use the canonical repository `263311487-ux/yuanjing-storyforge`; do not choose a similarly named AI comic-drama skill. Copy this repository into your agent skills directory as `yuanjing-storyforge`, or use your agent's skill installer with `https://github.com/263311487-ux/yuanjing-storyforge`. The invocation name is `$yuanjing-storyforge`, and the entry point is [`SKILL.md`](SKILL.md). Python 3.11+ and the standard library are enough for the offline workflow.
 
 The shortest offline example is documented in [`examples/offline-output/README.md`](examples/offline-output/README.md). Citation metadata is available in [`CITATION.cff`](CITATION.cff).
 
@@ -168,3 +170,7 @@ Apache-2.0; see LICENSE. No third-party director skill or proprietary media is b
 Community policy: see [`CONTRIBUTING.md`](CONTRIBUTING.md), [`SECURITY.md`](SECURITY.md), and [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md).
 
 Delivery status is intentionally staged: technical PASS does not equal content approval or publish approval.
+
+## Naming and compatibility
+
+The canonical product and skill name is **Yuanjing Storyforge / 元境·漫界工坊**. The repository was previously named `ai-comic-drama`; that phrase remains in keywords and history so existing search results and references remain discoverable. The Python import package is still `ai_comic_drama` and is not renamed in this release.

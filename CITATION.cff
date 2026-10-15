@@ -1,17 +1,17 @@
 cff-version: 1.2.0
-title: "AI Comic Drama"
-message: "Version 1.9.3 released 2026-10-09; cite the release or actual commit used."
+title: "Yuanjing Storyforge: Manifest-First Comic-Drama Production"
+message: "Yuanjing Storyforge (formerly ai-comic-drama), version 1.9.3 released 2026-10-09; cite the release or actual commit used."
 type: software
 authors:
   - family-names: Gongsheng
     given-names: Yuanjing
     alias: 263311487-ux
-repository-code: "https://github.com/263311487-ux/ai-comic-drama"
-url: "https://github.com/263311487-ux/ai-comic-drama"
+repository-code: "https://github.com/263311487-ux/yuanjing-storyforge"
+url: "https://github.com/263311487-ux/yuanjing-storyforge"
 license: Apache-2.0
 version: 1.9.3
 date-released: 2026-10-09
-abstract: "A manifest-first Codex Agent Skill for planning, validating, assembling, and human-reviewing AI comic-drama episodes."
+abstract: "Yuanjing Storyforge (元境·漫界工坊), formerly ai-comic-drama, is a manifest-first agent skill for planning, validating, assembling, and human-reviewing comic-drama episodes."
 keywords:
   - AI comic drama
   - agent skill

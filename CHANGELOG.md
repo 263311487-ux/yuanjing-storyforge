@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Rebrand the repository and skill as Yuanjing Storyforge / 元境·漫界工坊; retain `ai-comic-drama` as a search-compatibility keyword and Python module name.
+- Use `$yuanjing-storyforge` as the canonical skill invocation name.
+
 ## 1.9.3
 
 Released 2026-10-09. Completed canonical Apache-2.0 text, aligned metadata, documented captured synthetic offline outputs and prerequisites, and explicitly bounded report-hash approval versus media integrity and identity. Added source/output SHA-256 provenance. No provider API or generation changes.
