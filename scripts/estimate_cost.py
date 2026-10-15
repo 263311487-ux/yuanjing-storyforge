@@ -10,7 +10,7 @@ p.add_argument('--versions',type=int,default=1)
 a=p.parse_args()
 if not math.isfinite(a.rate) or a.rate<0 or not math.isfinite(a.pass_rate) or not 0<a.pass_rate<=1 or a.versions<1:
  p.error('rate must be finite and nonnegative; pass-rate in (0,1]; versions >= 1')
-d=json.loads(Path(a.manifest).read_text())
+d=json.loads(Path(a.manifest).read_text(encoding='utf-8'))
 seconds=sum(s['duration'] for s in d['shots'])
 if not math.isfinite(seconds) or seconds<=0: p.error('positive finite episode duration required')
 factor=a.versions/a.pass_rate

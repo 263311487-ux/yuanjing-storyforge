@@ -7,7 +7,7 @@ class BudgetExceeded(RuntimeError): pass
 
 def run_manifest(manifest, provider: Provider, state_path, *, dry_run=False):
     path = Path(state_path)
-    state = json.loads(path.read_text()) if path.exists() else {"status":"pending","attempts":0,"shots":{},"events":[]}
+    state = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {"status":"pending","attempts":0,"shots":{},"events":[]}
     budget = manifest.get("budget", {})
     max_attempts = int(budget.get("max_attempts", 0))
     max_shot_attempts = int(budget.get("max_shot_attempts", 1))
@@ -34,7 +34,7 @@ def run_manifest(manifest, provider: Provider, state_path, *, dry_run=False):
                 out=Path(state.get("output_dir","work/shots"))/f"{sid}.mp4"
                 artifact=provider.download(job_id,out); existing["artifact"]=artifact
                 if artifact.get("status")=="succeeded": existing["status"]="succeeded"
-                path.parent.mkdir(parents=True,exist_ok=True); path.write_text(json.dumps(state,ensure_ascii=False,indent=2))
+                path.parent.mkdir(parents=True,exist_ok=True); path.write_text(json.dumps(state,ensure_ascii=False,indent=2),encoding='utf-8')
                 if existing["status"] in {"submitted","running","download_pending"}: continue
                 if existing["status"]=="succeeded": continue
             if existing.get("status") in {"submitted","running","download_pending","succeeded"}:
@@ -46,7 +46,7 @@ def run_manifest(manifest, provider: Provider, state_path, *, dry_run=False):
         job = provider.submit_shot(shot, run_id)
         state["attempts"] += 1; state["shots"][sid] = {"status":job.status,"attempts":attempts+1,"job":json_job(job)}
         state["events"].append({"event":"shot_submitted","run_id":run_id,"shot_id":sid,"job":json_job(job)})
-        path.parent.mkdir(parents=True, exist_ok=True); path.write_text(json.dumps(state, ensure_ascii=False, indent=2))
+        path.parent.mkdir(parents=True, exist_ok=True); path.write_text(json.dumps(state, ensure_ascii=False, indent=2),encoding='utf-8')
     statuses=[x.get("status") for x in state["shots"].values()]
     state["status"] = "succeeded" if statuses and all(x=="succeeded" for x in statuses) else ("running" if any(x in {"submitted","running","download_pending"} for x in statuses) else "needs-review")
-    path.write_text(json.dumps(state, ensure_ascii=False, indent=2)); return state
+    path.write_text(json.dumps(state, ensure_ascii=False, indent=2),encoding='utf-8'); return state
