@@ -8,6 +8,9 @@ class Offline(unittest.TestCase):
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
     def test_compliance_is_read_as_utf8(self):
         self.assertEqual(run("scripts/check_compliance.py","examples/episode.json").returncode,0)
+    def test_previz_writes_utf8(self):
+        with tempfile.TemporaryDirectory() as d:
+            p=Path(d)/'previz.html'; self.assertEqual(run('scripts/previz.py','examples/episode.json','--out',str(p)).returncode,0); self.assertIn('charset="utf-8"',p.read_text(encoding='utf-8'))
     def test_manifest(self): self.assertEqual(run("scripts/validate_manifest.py","examples/episode.json").returncode,0)
     def test_manifest_strict(self): self.assertEqual(run("scripts/validate_manifest.py","examples/episode.json","--strict").returncode,0)
     def test_manifest_report(self):
