@@ -4,7 +4,7 @@ from ai_comic_drama.providers import MockProvider, Job
 from ai_comic_drama.runner import run_manifest
 ROOT=Path(__file__).parents[1]
 class Runner(unittest.TestCase):
- def setUp(self): self.m=json.loads((ROOT/'examples/episode.json').read_text())
+ def setUp(self): self.m=json.loads((ROOT/'examples/episode.json').read_text(encoding="utf-8"))
  def test_dry_run(self):
   with tempfile.TemporaryDirectory() as d: self.assertEqual(run_manifest(self.m,MockProvider(),Path(d)/'s.json',dry_run=True)['status'],'dry-run')
  def test_resume(self):

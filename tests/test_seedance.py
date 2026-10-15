@@ -4,7 +4,7 @@ from pathlib import Path
 from ai_comic_drama.seedance import SeedanceCLI
 ROOT=Path(__file__).parents[1]
 class Seedance(unittest.TestCase):
- def setUp(self): self.m=json.loads((ROOT/'examples/episode.json').read_text()); self.s=self.m['shots'][0]
+ def setUp(self): self.m=json.loads((ROOT/'examples/episode.json').read_text(encoding="utf-8")); self.s=self.m['shots'][0]
  def test_plan_is_network_free(self):
   p=SeedanceCLI(execute=False); self.assertFalse(p.execute); self.assertTrue(p.estimate(self.m)['requires_network'])
  def test_command(self):

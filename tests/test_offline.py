@@ -22,7 +22,7 @@ class Offline(unittest.TestCase):
     def test_continuity_check_reports_missing_source(self):
         import json
         with tempfile.TemporaryDirectory() as d:
-            manifest=Path(d)/"broken.json"; data=json.loads(Path(ROOT/"examples/episode.json").read_text()); data['shots'][1]['continuity_from']='S99'; manifest.write_text(json.dumps(data))
+            manifest=Path(d)/"broken.json"; data=json.loads(Path(ROOT/"examples/episode.json").read_text(encoding="utf-8")); data['shots'][1]['continuity_from']='S99'; manifest.write_text(json.dumps(data), encoding="utf-8")
             result=run("scripts/continuity_check.py",str(manifest),"--json")
             self.assertEqual(result.returncode,1); report=json.loads(result.stdout); self.assertEqual(report['status'],'FAIL'); self.assertEqual(report['issues'][0]['type'],'missing_continuity_source')
     def test_compliance(self): self.assertEqual(run("scripts/check_compliance.py","examples/episode.json").returncode,0)
@@ -32,15 +32,15 @@ class Offline(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d: self.assertEqual(run("scripts/qa_report.py","--manifest","examples/episode.json","--out",str(Path(d)/"q.json")).returncode,0)
     def test_srt(self):
         with tempfile.TemporaryDirectory() as d:
-            p=Path(d)/"episode.srt"; self.assertEqual(run("scripts/make_srt.py","examples/episode.json","--out",str(p)).returncode,0); self.assertIn('-->',p.read_text())
+            p=Path(d)/"episode.srt"; self.assertEqual(run("scripts/make_srt.py","examples/episode.json","--out",str(p)).returncode,0); self.assertIn('-->',p.read_text(encoding="utf-8"))
     def test_assemble_plan(self):
         with tempfile.TemporaryDirectory() as d:
-            p=Path(d)/"plan.json"; self.assertEqual(run("scripts/assemble_plan.py","examples/episode.json","--out",str(p)).returncode,0); self.assertEqual(__import__('json').loads(p.read_text())['status'],'blocked')
+            p=Path(d)/"plan.json"; self.assertEqual(run("scripts/assemble_plan.py","examples/episode.json","--out",str(p)).returncode,0); self.assertEqual(__import__('json').loads(p.read_text(encoding="utf-8"))['status'],'blocked')
     def test_quickstart(self):
         with tempfile.TemporaryDirectory() as d:
             out=Path(d)/"quickstart"; result=run("scripts/quickstart.py","examples/episode.json","--out",str(out))
             self.assertEqual(result.returncode,0, result.stderr)
-            data=__import__('json').loads((out/"quickstart.json").read_text())
+            data=__import__('json').loads((out/"quickstart.json").read_text(encoding="utf-8"))
             self.assertEqual(data["status"],"READY_FOR_PROVIDER_REVIEW")
             self.assertIn("quickstart.json",data["artifacts"])
     def test_init_manifest_creates_contract(self):

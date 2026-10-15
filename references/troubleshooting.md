@@ -17,7 +17,7 @@ The package has no runtime dependencies. A provider CLI and ffmpeg are separate 
 
 ## Seedance says `blocked`
 
-This is expected unless `SeedanceCLI(execute=True)` or `scripts/seedance_plan.py --execute` is explicitly used. The adapter is opt-in and this release has no claim of a successful live paid run. Confirm the provider budget and account before enabling it.
+Submission is blocked unless the API client uses `SeedanceCLI(execute=True)`. The script `seedance_plan.py` only prints a plan, even with `--execute`; it does not submit jobs. The adapter is opt-in and this release has no claim of a successful live paid run. Confirm the provider budget and account before enabling it.
 
 ## A Seedance submission is `unknown`
 

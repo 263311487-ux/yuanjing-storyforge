@@ -7,6 +7,6 @@ if not shutil.which('ffmpeg'): raise SystemExit('ffmpeg not found; install it or
 plan=json.loads(Path(a.plan).read_text(encoding='utf-8')); missing=plan.get('missing',[])
 if missing: raise SystemExit('assembly plan blocked; missing shots: '+','.join(missing))
 clips=[Path(x['path']) for x in plan['clips']]
-out=Path(a.out); out.parent.mkdir(parents=True,exist_ok=True); concat=out.parent/'concat.txt'; concat.write_text(''.join("file '"+str(p.resolve()).replace("'","'\\''")+"'\n" for p in clips))
+out=Path(a.out); out.parent.mkdir(parents=True,exist_ok=True); concat=out.parent/'concat.txt'; concat.write_text(''.join("file '"+str(p.resolve()).replace("'","'\\''")+"'\n" for p in clips), encoding="utf-8")
 cmd=['ffmpeg','-y','-f','concat','-safe','0','-i',str(concat),'-vf',f'scale={a.width}:{a.height}:force_original_aspect_ratio=increase,crop={a.width}:{a.height},setsar=1,fps={a.fps},format=yuv420p','-c:v','libx264','-preset','ultrafast','-c:a','aac','-ar','48000','-ac','2',str(out)]
 subprocess.run(cmd,check=True); print(out)
