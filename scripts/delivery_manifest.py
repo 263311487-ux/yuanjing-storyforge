@@ -36,10 +36,14 @@ def main():
     if not srt.exists(): raise SystemExit("字幕文件缺失，禁止生成交付清单")
     files.append({"path": str(srt), "sha256": sha(srt)})
     bound = {x.get("path"): x.get("sha256") for x in approval.get("files", [])}
-    for required_file in (video, man, srt):
+    for required_file in (video, man, srt, qa, compliance):
         key = str(required_file)
         if bound.get(key) != sha(required_file):
             raise SystemExit(f"人工批准未绑定当前文件或文件已更改：{key}")
+    for filename, digest in bound.items():
+        asset = Path(filename)
+        if not asset.is_file() or sha(asset) != digest:
+            raise SystemExit(f"人工批准未绑定当前文件或文件已更改：{filename}")
     result = {"status": "READY_FOR_PUBLISH", "title": cfg.get("title"), "episode": cfg.get("episode", "01"), "manifest": str(man), "release_metadata": metadata, "approval": json.loads(approval_path.read_text(encoding="utf-8")), "created_at": int(time.time()), "files": files, "quality_gates": {"technical": "PASS", "content": "PASS", "compliance": "PASS", "human_publish_approval": "PASS"}}
     out = Path(args.out); out = out if out.is_absolute() else video.parent / out
     out.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")

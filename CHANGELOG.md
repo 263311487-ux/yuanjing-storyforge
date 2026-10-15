@@ -4,6 +4,8 @@
 
 - Rebrand the repository and skill as Yuanjing Storyforge / 元境·漫界工坊; retain `ai-comic-drama` as a search-compatibility keyword and Python module name.
 - Use `$yuanjing-storyforge` as the canonical skill invocation name.
+- Bind publish approvals to every supplied release file with SHA-256 verification; changed media or evidence reports now block delivery.
+- Add a local installable Python compatibility package and harden Seedance CLI timeouts, task-ID validation, ambiguous submission handling, and download-only resume behavior.
 
 ## 1.9.3
 

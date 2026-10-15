@@ -16,19 +16,29 @@ def run_manifest(manifest, provider: Provider, state_path, *, dry_run=False):
         sid = shot["id"]
         existing = state["shots"].get(sid)
         if existing and existing.get("status") == "succeeded": continue
-        if existing and existing.get("status") in {"submitted", "running"}:
+        if existing and existing.get("status") == "unknown":
+            # Submission outcome is ambiguous (for example a CLI timeout).
+            # Never resubmit automatically: the provider may have accepted it.
+            continue
+        if existing and existing.get("status") in {"submitted", "running", "download_pending"}:
             job_id=(existing.get("job") or {}).get("job_id")
-            if job_id and hasattr(provider,"poll"):
+            if job_id and existing.get("status") != "download_pending" and hasattr(provider,"poll"):
                 job=provider.poll(job_id)
                 existing["status"]=job.status; existing["job"]=json_job(job)
                 state["events"].append({"event":"shot_polled","shot_id":sid,"job":json_job(job)})
                 if job.status=="succeeded" and hasattr(provider,"download"):
                     out=Path(state.get("output_dir","work/shots"))/f"{sid}.mp4"
                     artifact=provider.download(job_id,out); existing["artifact"]=artifact
-                    if artifact.get("status")!="succeeded": existing["status"]="failed"
+                    if artifact.get("status")!="succeeded": existing["status"]="download_pending"
+            elif job_id and existing.get("status") == "download_pending" and hasattr(provider,"download"):
+                out=Path(state.get("output_dir","work/shots"))/f"{sid}.mp4"
+                artifact=provider.download(job_id,out); existing["artifact"]=artifact
+                if artifact.get("status")=="succeeded": existing["status"]="succeeded"
                 path.parent.mkdir(parents=True,exist_ok=True); path.write_text(json.dumps(state,ensure_ascii=False,indent=2))
-                if existing["status"] in {"submitted","running"}: continue
+                if existing["status"] in {"submitted","running","download_pending"}: continue
                 if existing["status"]=="succeeded": continue
+            if existing.get("status") in {"submitted","running","download_pending","succeeded"}:
+                continue
         attempts = int(existing.get("attempts", 0)) if existing else 0
         if attempts >= max_shot_attempts: state["shots"][sid] = {"status":"blocked","attempts":attempts,"reason":"shot retry budget exhausted"}; continue
         if max_attempts and state["attempts"] >= max_attempts: raise BudgetExceeded("episode attempt budget exhausted")
@@ -38,5 +48,5 @@ def run_manifest(manifest, provider: Provider, state_path, *, dry_run=False):
         state["events"].append({"event":"shot_submitted","run_id":run_id,"shot_id":sid,"job":json_job(job)})
         path.parent.mkdir(parents=True, exist_ok=True); path.write_text(json.dumps(state, ensure_ascii=False, indent=2))
     statuses=[x.get("status") for x in state["shots"].values()]
-    state["status"] = "succeeded" if statuses and all(x=="succeeded" for x in statuses) else ("running" if any(x in {"submitted","running"} for x in statuses) else "needs-review")
+    state["status"] = "succeeded" if statuses and all(x=="succeeded" for x in statuses) else ("running" if any(x in {"submitted","running","download_pending"} for x in statuses) else "needs-review")
     path.write_text(json.dumps(state, ensure_ascii=False, indent=2)); return state

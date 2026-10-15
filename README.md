@@ -2,7 +2,7 @@
 
 **Yuanjing Storyforge** (元境·漫界工坊), formerly `ai-comic-drama`, is the unique name of this manifest-first comic-drama production skill. Search compatibility keywords: AI comic drama, AI short drama, 漫剧 skill.
 
-Source release **1.9.3**, published 2026-10-09. This repository does not publish a registry package. The Python library module remains `ai_comic_drama` for compatibility.
+Source release **1.9.3**, published 2026-10-09. The repository exposes a zero-runtime-dependency Python compatibility package named `yuanjing-storyforge`; its import module remains `ai_comic_drama` for compatibility.
 
 [![CI](https://github.com/263311487-ux/yuanjing-storyforge/actions/workflows/ci.yml/badge.svg)](https://github.com/263311487-ux/yuanjing-storyforge/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/263311487-ux/yuanjing-storyforge)](https://github.com/263311487-ux/yuanjing-storyforge/releases)
 
@@ -15,6 +15,14 @@ It is designed to be safe to try locally: examples and CI do not call paid provi
 ## Install as an agent skill
 
 Use the canonical repository `263311487-ux/yuanjing-storyforge`; do not choose a similarly named AI comic-drama skill. Copy this repository into your agent skills directory as `yuanjing-storyforge`, or use your agent's skill installer with `https://github.com/263311487-ux/yuanjing-storyforge`. The invocation name is `$yuanjing-storyforge`, and the entry point is [`SKILL.md`](SKILL.md). Python 3.11+ and the standard library are enough for the offline workflow.
+
+For Python integrations, install the compatibility package locally from a clone (not published to PyPI):
+
+```sh
+python3 -m pip install .
+```
+
+This installs `ai_comic_drama`; it does not install a provider CLI, ffmpeg, or paid-service credentials.
 
 The shortest offline example is documented in [`examples/offline-output/README.md`](examples/offline-output/README.md). Citation metadata is available in [`CITATION.cff`](CITATION.cff).
 
@@ -127,7 +135,7 @@ Run the full offline delivery gate with `python3 scripts/offline_delivery.py exa
 
 ## Human content review and publish approval
 
-Approval records bind the content-review report and the exact files supplied with `--file`. Bind the final video, manifest, subtitle, and cover files; the delivery gate rejects a missing or changed required file. Reviewer/publisher names remain self-reported strings, not authenticated identities or signatures. Before real distribution, separately verify reviewer identity and platform compliance.
+Approval records bind the content-review report and the exact files supplied with `--file`. Bind the final video, manifest, subtitle, technical QA, compliance report, and cover files; the delivery gate rejects a missing or changed required file. Reviewer/publisher names remain self-reported strings, not authenticated identities or signatures. Before real distribution, separately verify reviewer identity and platform compliance.
 
 Record an actual human review in `qa_result.json` (repeat `--shot` for each reviewed shot):
 
@@ -138,7 +146,7 @@ python3 scripts/record_content_review.py --out work/delivery/qa_result.json --st
 Use `PENDING_HUMAN_REVIEW` until review is complete, or `FAIL` when it fails. This records the review; it does not inspect video or grant publish approval. Only after content review PASS and independently verified compliance PASS may an authorized publisher create the separate, hash-bound approval:
 
 ```sh
-python3 scripts/approve_publish.py --qa work/delivery/qa_result.json --approved-by "Publisher" --basis "Release approved" --file work/delivery/master.mp4 --file examples/episode.json --file work/delivery/制作成果/subs/The\ Signal_EP01.srt
+python3 scripts/approve_publish.py --qa work/delivery/qa_result.json --approved-by "Publisher" --basis "Release approved" --file work/delivery/master.mp4 --file examples/episode.json --file "work/delivery/制作成果/subs/The Signal_EP01.srt" --file work/delivery/technical_qa.json --file work/delivery/compliance_result.json
 ```
 
 Changing `qa_result.json` or any bound file after approval invalidates that approval. The delivery manifest also requires technical QA PASS, compliance PASS, release metadata, subtitles, content review PASS, and separate human publish approval. Add one `--file` for each final cover or other release asset that the reviewer approved.

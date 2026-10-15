@@ -1,4 +1,5 @@
-import json,unittest
+import json,unittest,subprocess
+from unittest.mock import patch
 from pathlib import Path
 from ai_comic_drama.seedance import SeedanceCLI
 ROOT=Path(__file__).parents[1]
@@ -18,3 +19,27 @@ class Seedance(unittest.TestCase):
   self.assertEqual(SeedanceCLI.map_status({'status':'completed'}),'succeeded')
   self.assertEqual(SeedanceCLI.map_status({'state':'processing'}),'running')
   self.assertEqual(SeedanceCLI.map_status({'status':'error'}),'failed')
+ def test_success_exit_without_task_id_is_failed(self):
+  with patch('ai_comic_drama.seedance.subprocess.run',return_value=subprocess.CompletedProcess([],0,'{"success":true}','')):
+   job=SeedanceCLI(execute=True).submit_shot(self.s,'r1')
+  self.assertEqual(job.status,'unknown'); self.assertIn('missing_task_id',job.evidence['error'])
+ def test_submit_timeout_is_recorded_as_failed_job(self):
+  with patch('ai_comic_drama.seedance.subprocess.run',side_effect=subprocess.TimeoutExpired(['seedance'],3)) as run:
+   job=SeedanceCLI(execute=True,submit_timeout=3).submit_shot(self.s,'r1')
+  self.assertEqual(job.status,'unknown'); self.assertEqual(job.evidence['error'],'timeout')
+  self.assertEqual(run.call_args.kwargs['timeout'],3)
+ def test_poll_timeout_is_recorded_without_raising(self):
+  with patch('ai_comic_drama.seedance.subprocess.run',side_effect=subprocess.TimeoutExpired(['seedance'],2)) as run:
+   job=SeedanceCLI(poll_timeout=2).poll('task-1')
+  self.assertEqual(job.status,'running'); self.assertEqual(job.evidence['error'],'timeout')
+  self.assertEqual(run.call_args.kwargs['timeout'],2)
+ def test_poll_rejects_mismatched_task_id(self):
+  response=subprocess.CompletedProcess([],0,'{"task_id":"other","status":"completed"}','')
+  with patch('ai_comic_drama.seedance.subprocess.run',return_value=response):
+   job=SeedanceCLI().poll('task-1')
+  self.assertEqual(job.status,'failed'); self.assertEqual(job.evidence['error'],'task_id_mismatch')
+ def test_download_timeout_is_recorded(self):
+  with patch('ai_comic_drama.seedance.subprocess.run',side_effect=subprocess.TimeoutExpired(['seedance'],2)) as run:
+   job=SeedanceCLI(download_timeout=2).download('task-1',Path('/tmp/storyforge-timeout.mp4'))
+  self.assertEqual(job['status'],'failed'); self.assertEqual(job['error'],'timeout')
+  self.assertEqual(run.call_args.kwargs['timeout'],2)

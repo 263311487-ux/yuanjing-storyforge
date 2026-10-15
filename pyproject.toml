@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yuanjing-storyforge"
+version = "1.9.3"
+description = "Manifest-first AI comic-drama production planning and offline QA tools"
+readme = "README_EN.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [{ name = "Yuanjing Storyforge contributors" }]
+keywords = ["agent-skill", "comic-drama", "storyboard", "video-workflow"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/263311487-ux/yuanjing-storyforge"
+Repository = "https://github.com/263311487-ux/yuanjing-storyforge"
+Issues = "https://github.com/263311487-ux/yuanjing-storyforge/issues"
+
+[tool.setuptools]
+packages = ["ai_comic_drama"]

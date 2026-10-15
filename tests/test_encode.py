@@ -14,6 +14,20 @@ class Encode(unittest.TestCase):
    proc=subprocess.run(['python3',str(ROOT/'scripts/delivery_manifest.py'),'--video',str(video),'--manifest',str(manifest),'--qa',str(target/'technical_qa.json'),'--out',str(target/'delivery.json')],capture_output=True,text=True)
    self.assertNotEqual(proc.returncode,0); self.assertIn('人工批准未绑定当前文件或文件已更改',proc.stderr+proc.stdout)
  @unittest.skipUnless(shutil.which('ffmpeg'),'ffmpeg unavailable')
+ def test_delivery_rejects_compliance_report_replaced_after_approval(self):
+  with tempfile.TemporaryDirectory() as d:
+   target=Path(d)/'delivery'; subprocess.run(['python3',str(ROOT/'scripts/offline_delivery.py'),str(ROOT/'examples/episode.json'),'--out',str(target)],check=True,stdout=subprocess.DEVNULL)
+   compliance=target/'compliance_result.json'; compliance.write_text(json.dumps({'status':'PASS','review':'approved'}))
+   qa=target/'qa_result.json'; q=json.loads(qa.read_text()); q['status']='PASS'; qa.write_text(json.dumps(q))
+   video=target/'master.mp4'; manifest=ROOT/'examples/episode.json'; srt=Path(json.loads((target/'technical_qa.json').read_text())['subtitle']['path'])
+   files=[video,manifest,srt,qa,compliance,target/'technical_qa.json']
+   args=['python3',str(ROOT/'scripts/approve_publish.py'),'--qa',str(qa),'--approved-by','reviewer','--basis','reviewed']
+   for f in files: args += ['--file',str(f)]
+   subprocess.run(args,check=True,stdout=subprocess.DEVNULL)
+   compliance.write_text(json.dumps({'status':'PASS','review':'changed after approval'}))
+   proc=subprocess.run(['python3',str(ROOT/'scripts/delivery_manifest.py'),'--video',str(video),'--manifest',str(manifest),'--qa',str(target/'technical_qa.json'),'--out',str(target/'delivery.json')],capture_output=True,text=True)
+   self.assertNotEqual(proc.returncode,0); self.assertIn('人工批准未绑定当前文件或文件已更改',proc.stderr+proc.stdout)
+ @unittest.skipUnless(shutil.which('ffmpeg'),'ffmpeg unavailable')
  def test_fixture_encode_and_plan(self):
   with tempfile.TemporaryDirectory() as d:
    d=Path(d); shots=d/'shots'; shots.mkdir()
@@ -41,6 +55,6 @@ class Encode(unittest.TestCase):
    qa=target/'qa_result.json'; q=json.loads(qa.read_text()); q['status']='PASS'; qa.write_text(json.dumps(q))
    compliance=target/'compliance_result.json'; compliance.write_text(json.dumps({'status':'PASS','source':'test-only explicit override'}))
    srt=Path(json.loads((target/'technical_qa.json').read_text())['subtitle']['path'])
-   subprocess.run(['python3',str(ROOT/'scripts/approve_publish.py'),'--qa',str(target/'qa_result.json'),'--approved-by','test-reviewer','--basis','offline fixture review','--file',str(target/'master.mp4'),'--file',str(ROOT/'examples/episode.json'),'--file',str(srt)],check=True)
+   subprocess.run(['python3',str(ROOT/'scripts/approve_publish.py'),'--qa',str(target/'qa_result.json'),'--approved-by','test-reviewer','--basis','offline fixture review','--file',str(target/'master.mp4'),'--file',str(ROOT/'examples/episode.json'),'--file',str(srt),'--file',str(target/'technical_qa.json'),'--file',str(compliance)],check=True)
    out=target/'delivery.json'; subprocess.run(['python3',str(ROOT/'scripts/delivery_manifest.py'),'--video',str(target/'master.mp4'),'--manifest',str(ROOT/'examples/episode.json'),'--qa',str(target/'technical_qa.json'),'--out',str(out)],check=True)
    self.assertEqual(json.loads(out.read_text())['status'],'READY_FOR_PUBLISH')

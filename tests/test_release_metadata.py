@@ -7,6 +7,13 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class ReleaseMetadataTests(unittest.TestCase):
+    def test_python_package_metadata_declares_installable_compatibility_package(self):
+        text = (ROOT / 'pyproject.toml').read_text()
+        self.assertIn('name = "yuanjing-storyforge"', text)
+        self.assertIn('packages = ["ai_comic_drama"]', text)
+        for file in ('README.md', 'README_EN.md'):
+            self.assertIn('python3 -m pip install .', (ROOT / file).read_text())
+
     def test_citation_and_skill_identify_the_current_changelog_release(self):
         release = re.search(r'^## (\d+\.\d+\.\d+)\s*$', (ROOT / 'CHANGELOG.md').read_text(), re.M).group(1)
         for file in ('CITATION.cff', 'SKILL.md'):
