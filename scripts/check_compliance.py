@@ -2,7 +2,7 @@
 import re,sys
 from pathlib import Path
 def main(p):
- text=Path(p).read_text(); hits=[]
+ text=Path(p).read_text(encoding='utf-8'); hits=[]
  for label,pat in [('real-person reference','真人脸|real person|celebrity'),('graphic violence','斩首|断肢|gore|beheading'),('sexual content','色情|裸露|explicit sex')]:
   if re.search(pat,text,re.I): hits.append(label)
  if hits: print('REVIEW_REQUIRED:',', '.join(hits)); return 2

@@ -6,6 +6,8 @@ class Offline(unittest.TestCase):
     def test_manifest_is_read_as_utf8(self):
         result=run("scripts/validate_manifest.py","examples/episode.json")
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+    def test_compliance_is_read_as_utf8(self):
+        self.assertEqual(run("scripts/check_compliance.py","examples/episode.json").returncode,0)
     def test_manifest(self): self.assertEqual(run("scripts/validate_manifest.py","examples/episode.json").returncode,0)
     def test_manifest_strict(self): self.assertEqual(run("scripts/validate_manifest.py","examples/episode.json","--strict").returncode,0)
     def test_manifest_report(self):
