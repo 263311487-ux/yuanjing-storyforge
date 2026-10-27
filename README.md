@@ -1,5 +1,8 @@
 # Yuanjing Storyforge · 元境·漫界工坊
 
+![Yuanjing Storyforge · 元境·漫界工坊](assets/social-preview.svg)
+
+
 **Yuanjing Storyforge** (元境·漫界工坊), formerly `ai-comic-drama`, is the unique name of this manifest-first comic-drama production skill. Search compatibility keywords: AI comic drama, AI short drama, 漫剧 skill.
 
 Source release **1.9.3**, published 2026-10-09. The repository exposes a zero-runtime-dependency Python compatibility package named `yuanjing-storyforge`; its import module remains `ai_comic_drama` for compatibility.
