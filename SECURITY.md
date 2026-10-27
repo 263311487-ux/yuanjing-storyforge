@@ -1,11 +1,20 @@
 # Security Policy
 
-## Reporting a vulnerability
+## Reporting
 
-Please do not open a public issue for credentials, private media, account data, or a suspected security vulnerability. Use the repository owner’s GitHub private contact channel and include a minimal reproduction with secrets removed.
+If you find a security issue in yuanjing-storyforge:
 
-The project never needs provider credentials in manifests, logs, fixtures, or pull requests. Paid provider execution must remain explicit opt-in.
+1. Do **not** open a public issue.
+2. Email: 263311487@qq.com — description, reproduction steps, severity.
+3. Response within 72 hours.
 
 ## Scope
 
-Reports about credential exposure, unsafe command construction, path traversal, or accidental network/provider calls are in scope. General provider failures belong in the Provider Adapter Request template.
+- Manifest parsing (path traversal, schema injection)
+- Provider adapter credential handling (keys must not appear in logs or manifests)
+- The approval record system (hash binding, file integrity)
+
+## Notes
+
+- Provider credentials (API keys, tokens) must never be committed to manifests or run state. The adapter layer is responsible for sourcing them from environment variables.
+- The approval hash system (`scripts/approve_publish.py`) binds file hashes at approval time. Changing a bound file after approval invalidates the record — this is by design, not a bug.
