@@ -1,0 +1,30 @@
+name: Bug report
+description: Script crash, manifest validation error, or wrong offline output
+labels: ["bug"]
+body:
+  - type: textarea
+    id: command
+    attributes:
+      label: Command you ran
+      placeholder: "python scripts/validate_manifest.py examples/episode.json"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual output / error
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version (from CHANGELOG or git tag)
+      placeholder: "1.9.3"
+    validations:
+      required: true
