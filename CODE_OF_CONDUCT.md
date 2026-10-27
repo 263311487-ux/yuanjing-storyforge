@@ -1,9 +1,5 @@
-# Contributor Covenant Code of Conduct
+# Code of Conduct
 
-## Our standard
+We follow the Contributor Covenant 2.1: https://www.contributor-covenant.org/version/2/1/code_of_conduct/
 
-Contributors are expected to be respectful, specific, and constructive. Keep production examples safe to share: remove credentials, private media, account identifiers, and client-specific billing data.
-
-## Enforcement
-
-Maintainers may remove abusive, unsafe, or credential-bearing content and close contributions that do not meet these standards. Report serious conduct concerns privately through the repository owner’s GitHub contact channel.
+This project values epistemically honest discussion: state claims with their evidence, acknowledge uncertainty, and update when shown a better argument. That applies to protocol design discussions as much as it does to code review.
