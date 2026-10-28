@@ -7,7 +7,10 @@
 
 Source release **1.9.3**, published 2026-10-09. The repository exposes a zero-runtime-dependency Python compatibility package named `yuanjing-storyforge`; its import module remains `ai_comic_drama` for compatibility.
 
-[![CI](https://github.com/263311487-ux/yuanjing-storyforge/actions/workflows/ci.yml/badge.svg)](https://github.com/263311487-ux/yuanjing-storyforge/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/263311487-ux/yuanjing-storyforge)](https://github.com/263311487-ux/yuanjing-storyforge/releases)
+[![CI](https://github.com/263311487-ux/yuanjing-storyforge/actions/workflows/ci.yml/badge.svg)](https://github.com/263311487-ux/yuanjing-storyforge/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/yuanjing-storyforge?style=flat-square)](https://pypi.org/project/yuanjing-storyforge/)
+[![Python](https://img.shields.io/pypi/pyversions/yuanjing-storyforge?style=flat-square)](https://pypi.org/project/yuanjing-storyforge/)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue?style=flat-square)](LICENSE) [![Release](https://img.shields.io/github/v/release/263311487-ux/yuanjing-storyforge)](https://github.com/263311487-ux/yuanjing-storyforge/releases)
 
 Manifest-first Agent Skill for planning and validating AI comic-drama production. It provides provider-neutral contracts, offline resumable runs, cost gates, subtitle and assembly planning, optional encoding, technical QA, and auditable human review gates.
 
